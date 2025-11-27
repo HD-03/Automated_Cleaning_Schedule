@@ -1,10 +1,19 @@
+import os
 import yaml
 
 def load_config(path: str = "config.yaml") -> dict:
     """
     Loads YAML configuration file and returns a dictionary.
     """
-    with open(path, "r") as f:
+
+    
+    # Find directory containing THIS file (utils.py)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Config file is one level above: app/config.yaml
+    config_path = os.path.abspath(os.path.join(base_dir, "..", path))
+
+    with open(config_path, "r") as f:
         return yaml.safe_load(f)
     
 

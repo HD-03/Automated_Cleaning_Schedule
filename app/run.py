@@ -1,15 +1,17 @@
-from utils import load_config, merge_bookings
-from fetch_calendars import fetch_calendar
-from parse_ical import parse_ical
-from generate_schedule import detect_changeovers, save_schedule_csv
-from generate_ics import save_schedule_ics
+from config.utils import load_config, merge_bookings
+from calendars.fetch_calendars import fetch_calendar
+from calendars.parse_ical import parse_ical
 
-# imports for weekly/change messages
-from state_manager import load_previous_state, save_state
-from diff_events import diff_events
-from message_builder import build_weekly_message, build_change_message
+from schedule.generate_schedule import detect_changeovers, save_schedule_csv
+from schedule.generate_ics import save_schedule_ics
+from schedule.state_manager import load_previous_state, save_state
+from schedule.diff_events import diff_events
+
+from messaging.message_builder import build_weekly_message, build_change_message
+
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+
 
 
 
