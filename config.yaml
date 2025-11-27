@@ -1,0 +1,14 @@
+properties:
+  - id: 1
+    name: "South Woodford"
+    calendars:
+      - "https://www.airbnb.com/calendar/ical/1384685291737448175.ics?s=f99a7d58082ba5fd66c9b4ecbd507cc9&locale=en-GB"
+    cleaners:
+      - "CleanerA"
+
+  - id: 2
+    name: "Angel"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=6d52c1c8-2045-4954-a576-9eed867fdf29"
+    cleaners:
+      - "CleanerB"
