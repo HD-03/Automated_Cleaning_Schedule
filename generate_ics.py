@@ -1,14 +1,22 @@
 from icalendar import Calendar, Event
 from datetime import datetime
+from google.cloud import storage
 
-def save_schedule_ics(tasks, path):
-    """
-    Creates an ICS calendar file containing all cleaning tasks for a property.
-    """
+def upload_to_gcs(local_path, bucket_name, object_name):
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(object_name)
+    blob.upload_from_filename(local_path)
+    return f"https://storage.googleapis.com/{bucket_name}/{object_name}"
 
+def save_schedule_ics(tasks, property_name, path):
     cal = Calendar()
     cal.add("prodid", "-//Cleaning Schedule//EN")
     cal.add("version", "2.0")
+
+    # This sets the calendar name users see in Google/Apple Calendar
+    cal.add("X-WR-CALNAME", f"{property_name} – Cleaning Schedule")
+
 
     for task in tasks:
         event = Event()
@@ -23,5 +31,15 @@ def save_schedule_ics(tasks, path):
 
         cal.add_component(event)
 
+    # Write to local file first
     with open(path, "wb") as f:
         f.write(cal.to_ical())
+
+    # Upload to GCS
+    bucket_name = "cleaning-scheduler-bucket"
+    object_name = path 
+    public_url = upload_to_gcs(path, bucket_name, object_name)
+
+    print(f"Uploaded to: {public_url}")
+    return public_url
+

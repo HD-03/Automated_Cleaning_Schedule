@@ -2,3 +2,4 @@ requests
 icalendar
 PyYAML
 python-dateutil
+google-cloud-storage
