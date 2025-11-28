@@ -1,14 +1,98 @@
 properties:
   - id: 1
     name: "South Woodford"
+    property_management_company: "VZ Property Group"
     calendars:
       - "https://www.airbnb.com/calendar/ical/1384685291737448175.ics?s=f99a7d58082ba5fd66c9b4ecbd507cc9&locale=en-GB"
     cleaners:
-      - "CleanerA"
+      - "Layes"
 
   - id: 2
     name: "Angel"
+    property_management_company: "VZ Property Group"
     calendars:
       - "https://ical.booking.com/v1/export?t=6d52c1c8-2045-4954-a576-9eed867fdf29"
     cleaners:
-      - "CleanerB"
+      - "Layes"
+
+  - id: 3
+    name: "Woodford Green"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://www.airbnb.com/calendar/ical/1535661475478916047.ics?s=70012077122147e64231221fde51474a&locale=en-GB"
+    cleaners:
+      - "Layes"
+
+
+  - id: 4
+    name: "Hoxton"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=716bba18-3272-46c3-9344-097f73c204fd"
+    cleaners:
+      - "Layes"
+
+  - id: 5
+    name: "Room 1 Whitechapel"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=a523015a-3b95-411e-bfe4-cd41719ae9c3"
+    cleaners:
+      - "Whitechapel Cleaner"
+
+  - id: 6
+    name: "Room 2 Whitechapel"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=8d62477a-dede-4100-95f2-21ea499f58ec"
+    cleaners:
+      - "Whitechapel Cleaner"
+
+  - id: 7
+    name: "Room 3 Whitechapel"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=2df22893-8f36-4ced-a70a-6b817bfbdf83"
+    cleaners:
+      - "Whitechapel Cleaner"
+
+  - id: 8
+    name: "Room 4 Whitechapel"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=089729d0-b6b7-434d-87b7-8a1bac41a1ce"
+    cleaners:
+      - "Whitechapel Cleaner"
+
+  - id: 9
+    name: "Room 5 Whitechapel"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=a3c8fc60-934a-4e6d-a249-9698fd56f825"
+    cleaners:
+      - "Whitechapel Cleaner"
+
+  - id: 10
+    name: "Room 6 Whitechapel"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=88838cb8-2413-438a-8f81-56716db22d01"
+    cleaners:
+      - "Whitechapel Cleaner"
+
+  - id: 11
+    name: "Room 7 Whitechapel"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=a2f11269-5979-41bf-80d6-64f61b727ec1"
+    cleaners:
+      - "Whitechapel Cleaner"
+
+  - id: 12
+    name: "Room 8 Whitechapel"
+    property_management_company: "VZ Property Group"
+    calendars:
+      - "https://ical.booking.com/v1/export?t=8e2092ba-0536-459a-b4d1-13b3ec7d5670"
+    cleaners:
+      - "Whitechapel Cleaner"
+

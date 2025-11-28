@@ -9,7 +9,7 @@ def upload_to_gcs(local_path, bucket_name, object_name):
     blob.upload_from_filename(local_path)
     return f"https://storage.googleapis.com/{bucket_name}/{object_name}"
 
-def save_schedule_ics(tasks, property_name, path):
+def save_schedule_ics(tasks, property_name, path, cleaners = None):
     cal = Calendar()
     cal.add("prodid", "-//Cleaning Schedule//EN")
     cal.add("version", "2.0")
@@ -26,6 +26,15 @@ def save_schedule_ics(tasks, property_name, path):
 
         event.add("uid", task["id"])
         event.add("summary", f"{task['type']} – {task['property']}")
+
+        if cleaners:
+            if isinstance(cleaners, list):
+                clean_str = ", ".join(cleaners)
+            else:
+                clean_str = cleaners
+
+            event.add("description", f"Cleaner: {clean_str}")
+
         event.add("dtstart", date_obj)
         event.add("dtend", date_obj)  # all-day event
 
