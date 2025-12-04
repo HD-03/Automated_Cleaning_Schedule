@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 
 def format_event_line(event: dict) -> str:
@@ -14,6 +15,54 @@ def format_event_line(event: dict) -> str:
 
     return f"{date_str} – {event['type']} ({cleaner})"
 
+
+def build_current_week_remaining_message(property_name: str, events: dict) -> str:
+    """
+    Show ALL remaining cleanings for THIS WEEK:
+    - Starting from the beginning of TODAY (00:00)
+    - Ending at Sunday 14:00 UK
+    """
+
+    # Current UK time
+    now_uk = datetime.now(ZoneInfo("Europe/London"))
+
+    # Start of today (00:00 UK)
+    start_of_today = now_uk.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # Compute this coming Sunday at 14:00 UK
+    days_until_sunday = (6 - now_uk.weekday()) % 7
+    sunday_2pm = (now_uk + timedelta(days=days_until_sunday)).replace(
+        hour=14, minute=0, second=0, microsecond=0
+    )
+
+    def in_remaining_window(ev):
+        dt = datetime.strptime(ev["date"], "%d/%m/%Y").replace(
+            tzinfo=ZoneInfo("Europe/London")
+        )
+        # Include today fully, then up to Sunday 14:00
+        return start_of_today.date() <= dt.date() <= sunday_2pm.date()
+
+    # Filter events
+    window_events = [ev for ev in events.values() if in_remaining_window(ev)]
+
+    # Sort chronologically
+    window_events.sort(
+        key=lambda e: datetime.strptime(e["date"], "%d/%m/%Y")
+    )
+
+    lines = [
+        f"Updated Cleaning Schedule – {property_name}",
+        f"{start_of_today.strftime('%d %b')} → Sunday {sunday_2pm.strftime('%d %b %H:%M')}",
+        "----------------------------------------",
+    ]
+
+    if not window_events:
+        lines.append("No remaining cleanings for this week.")
+    else:
+        for event in window_events:
+            lines.append(format_event_line(event))
+
+    return "\n".join(lines)
 
 
 def build_weekly_message(property_name: str, events: dict) -> str:
@@ -69,7 +118,7 @@ def build_change_message(property_name: str, new_events: dict, diff: dict) -> st
     """
 
     # First show the updated schedule
-    message = build_weekly_message(property_name, new_events)
+    message = build_current_week_remaining_message(property_name, new_events)
     message += "\n\nChanges since last update:\n"
 
     # Handle added

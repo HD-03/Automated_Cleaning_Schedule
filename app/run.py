@@ -9,12 +9,54 @@ from schedule.diff_events import diff_events
 
 from messaging.message_builder import build_weekly_message, build_change_message
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 
 from messaging.emailer import send_email
 
 open("ics_index.txt", "w").close()   # clear the file for fresh run
+
+# Only consider changes happening before cutoff
+def change_before_cutoff(diff, cutoff, now_uk):
+    # added
+    for e in diff["added"].values():
+        if now_uk <= event_dt(e) < cutoff:
+            return True
+    # removed
+    for e in diff["removed"].values():
+        if now_uk <= event_dt(e) < cutoff:
+            return True
+    # changed
+    for c in diff["changed"].values():
+        if now_uk <= event_dt(c["new"]) < cutoff:
+            return True
+    return False
+
+def filter_diff_by_cutoff(diff, cutoff, now_uk):
+    filtered = {"added": {}, "removed": {}, "changed": {}, "unchanged": {}}
+
+    # added
+    for k, e in diff["added"].items():
+        if now_uk <= event_dt(e) < cutoff:
+            filtered["added"][k] = e
+
+    # removed
+    for k, e in diff["removed"].items():
+        if now_uk <= event_dt(e) < cutoff:
+            filtered["removed"][k] = e
+
+    # changed
+    for k, c in diff["changed"].items():
+        if now_uk <= event_dt(c["new"]) < cutoff:
+            filtered["changed"][k] = c
+
+    return filtered
+
+def event_dt(e):
+    return datetime.strptime(e["date"], "%d/%m/%Y").replace(
+        tzinfo=ZoneInfo("Europe/London")
+    )
+
 
 def same_week(ts_iso: str, now: datetime) -> bool:
     """Check if timestamp (ISO string) is in the same calendar week as now."""
@@ -31,6 +73,7 @@ def main():
     config = load_config()
 
     for prop in config["properties"]:
+        property_change_email_sent = False
         name = prop["name"]
         calendars = prop["calendars"]
         cleaners = prop.get("cleaners", [])
@@ -79,7 +122,7 @@ def main():
 
         # Build dictionary of new events keyed by ID
         new_events = {
-            t["id"]: {
+            f"{name}-{t['date']}": {
                 "date": t["date"],
                 "type": t["type"],
                 "assigned_cleaner": t["assigned_cleaner"]
@@ -101,16 +144,25 @@ def main():
 
         # For testing, uncomment the line below to simulate Sunday 2PM UK time
         #now_uk = datetime(2025, 12, 7, 14, 0, tzinfo=ZoneInfo("Europe/London"))
-
+        
+        # Compute next Sunday @ 14:00 UK
+        days_to_sunday = (6 - now_uk.weekday()) % 7
+        if days_to_sunday == 0 and now_uk.hour >= 14:
+            days_to_sunday = 7
         # True when it's Sunday 2PM UK time
         is_sunday_summary = (now_uk.weekday() == 6 and now_uk.hour == 14)
-
+        cutoff = (now_uk + timedelta(days=days_to_sunday)).replace(
+            hour=14, minute=0, second=0, microsecond=0
+        )
         # Draft message
         if is_sunday_summary:
             message = build_weekly_message(name, new_events)
             #prev_state["last_full_message"] = now_utc.isoformat()
         else:
-            message = build_change_message(name, new_events, diff)
+           #message = build_change_message(name, new_events, diff)
+           filtered = filter_diff_by_cutoff(diff, cutoff, now_uk)
+           message = build_change_message(name, new_events, filtered)
+
 
         # Log the drafted message
         print("--- Drafted Message ---")
@@ -125,15 +177,26 @@ def main():
         already_sent_weekly = last_full and same_week(last_full, now_uk)
 
         should_send_weekly = is_sunday_summary and not already_sent_weekly
-        should_send_change = (not is_sunday_summary) and changes_exist
+
+
+
+        #should_send_change = (not is_sunday_summary) and changes_exist
+        should_send_change = (
+        not is_sunday_summary
+        and changes_exist
+        and change_before_cutoff(diff, cutoff, now_uk)
+        )
+
 
         should_send_email = should_send_weekly or should_send_change
 
-        if should_send_email:
+        if should_send_email and not property_change_email_sent:
             print("📨 Sending email...")
 
             subject = f"Cleaning Update – {name}"
             send_email(subject, message)
+            property_change_email_sent = True
+
 
             # Record weekly summary timestamp
             if should_send_weekly:
